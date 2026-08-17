@@ -1,0 +1,8 @@
+# Tarayıcı test profilleri ve üretilen ekran görüntüleri
+tests/*profile*/
+tests/*.png
+
+# İşletim sistemi dosyaları
+Thumbs.db
+desktop.ini
+.DS_Store

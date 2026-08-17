@@ -1,0 +1,14 @@
+<!doctype html><meta charset="utf-8"><title>Oyun Motoru Testleri</title><pre id="out"></pre>
+<script src="../js/defaultQuestions.js"></script><script src="../js/gameEngine.js"></script><script>
+var out=document.getElementById('out'),pass=0,fail=0;
+function t(name,fn){try{fn();out.textContent+='✓ '+name+'\n';pass++;}catch(e){out.textContent+='✗ '+name+': '+e.message+'\n';fail++;}}
+function ok(v,m){if(!v)throw Error(m||'başarısız');}
+function subset(last){return PassaparolaDefaults.questions.map(function(q){return Object.assign({},q,{enabled:PassaparolaDefaults.letters.indexOf(q.letter)<=PassaparolaDefaults.letters.indexOf(last)});});}
+t('28 soru tamamlanınca biter',function(){var e=new PassaparolaEngine.Engine();e.start(PassaparolaDefaults.questions);for(var i=0;i<28;i++)e.resolve('correct');ok(!e.running);});
+t('Yanlış cevap kırmızı görünür ve sıradaki harfe geçmez',function(){var e=new PassaparolaEngine.Engine();e.start(subset('M'));for(var i=0;i<14;i++)e.resolve('correct');var q=e.current,r=e.resolve('wrong');ok(r.restart&&e.current===q&&e.status[q.letter]==='wrong');});
+t('Yanlış sonrası aynı sorularla A harfine döner',function(){var e=new PassaparolaEngine.Engine();e.start(subset('M'));var ids=e.questions.map(function(q){return q.id;}).join(',');e.resolve('correct');e.resolve('wrong');e.restartRound();ok(e.current.letter==='A'&&e.score===0&&e.questions.map(function(q){return q.id;}).join(',')===ids);});
+t('C pas ise M sonrasında C yeniden gelir',function(){var e=new PassaparolaEngine.Engine();e.start(subset('M'));e.resolve('correct');e.resolve('correct');e.resolve('passed');for(var i=0;i<12;i++)e.resolve('correct');ok(e.running&&e.current.letter==='C'&&e.status.C==='active');e.resolve('correct');ok(!e.running);});
+t('Harf başına yalnız bir aktif soru seçilir',function(){var e=new PassaparolaEngine.Engine(),a=PassaparolaDefaults.questions[0];e.start([a,Object.assign({},a,{id:'ikinci'}),PassaparolaDefaults.questions[1]]);ok(e.questions.length===2&&e.current.id===a.id);});
+t('Türkçe/büyük-küçük/boşluk normalizasyonu',function(){var e=new PassaparolaEngine.Engine();e.start([PassaparolaDefaults.questions[0]]);ok(e.answer('  ANONS  ').correct);});
+out.textContent+='\n'+pass+' başarılı, '+fail+' başarısız';document.title=fail?'TEST BAŞARISIZ':'TÜM TESTLER BAŞARILI';
+</script>

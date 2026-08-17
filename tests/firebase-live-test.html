@@ -1,0 +1,15 @@
+<!doctype html><meta charset="utf-8"><title>Firebase canlı bağlantı testi</title><pre id="result">TEST ÇALIŞIYOR</pre><script src="../firebase-config.js"></script><script type="module">
+const out=document.getElementById('result');
+try{
+  const appSdk=await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js');
+  const authSdk=await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js');
+  const dbSdk=await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js');
+  const app=appSdk.initializeApp(window.PASSAPAROLA_FIREBASE_CONFIG);
+  const credential=await authSdk.signInAnonymously(authSdk.getAuth(app));
+  const db=dbSdk.getDatabase(app),code='TEST'+Date.now(),ref=dbSdk.ref(db,'rooms/'+code);
+  await dbSdk.set(ref,{teacherUid:credential.user.uid,status:'test',createdAt:dbSdk.serverTimestamp()});
+  const snap=await dbSdk.get(ref);if(!snap.exists())throw Error('Yazılan test odası okunamadı.');
+  await dbSdk.remove(ref);
+  out.textContent='FIREBASE_TEST_BASARILI';document.title='FIREBASE_TEST_BASARILI';
+}catch(e){out.textContent='FIREBASE_TEST_HATASI: '+e.message;document.title='FIREBASE_TEST_HATASI';}
+</script>
